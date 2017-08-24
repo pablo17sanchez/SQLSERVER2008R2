@@ -1,0 +1,3 @@
+
+select   PALMID,CODPROD,COUNT(*) as CANTIDAD, 'DELETE TOP (1)   from alaska_pcomdb..OUT_PRODUCTO WHERE PALMID='''+PALMID+''' AND CODPROD='''+CODPROD+''''
+ from alaska_pcomdb..OUT_PRODUCTO group by PALMID,CODPROD HAVING COUNT(*)>1

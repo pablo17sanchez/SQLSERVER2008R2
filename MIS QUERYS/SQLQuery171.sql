@@ -1,0 +1,50 @@
+SELECT BACHNUMB'LOTE',
+         DOCID,
+         CUSTNMBR'Cod. CLIENTE',
+         CUSTNAME'NOMBRE',
+         SOPNUMBE'Numero_factura',
+         DOCDATE'FECHA',
+         IdVendedor,
+         ITEMNMBR'Codigo Producto',
+         ITEMDESC  'Nombre Producto',
+         LOCNCODE'Localidad',
+         UNITPRCE'Precio Unidad',
+         QUANTITY'Cantidad',
+         XTNDPRCE'Monto de linea',
+         DOCAMNT'Monto Total',
+         PYMTRCVD'Monto Pagado',
+         NCF
+     FROM dbo.View_VentasGP2
+WHERE DOCDATE BETWEEN '20120101' AND '20120131' --AND PYMTRCVD=0
+ORDER BY SOPNUMBE
+
+
+SELECT BACHNUMB'LOTE',
+         DOCID,
+         CUSTNMBR'Cod. CLIENTE',
+         CUSTNAME'NOMBRE',
+         SOPNUMBE'Numero_factura',
+         DOCDATE'FECHA',
+         IdVendedor,
+         ITEMNMBR'Codigo Producto',
+         ITEMDESC  'Nombre Producto',
+         LOCNCODE'Localidad',
+         UNITPRCE'Precio Unidad',
+         QUANTITY'Cantidad',
+         XTNDPRCE'Monto de linea',
+         DOCAMNT'Monto Total',
+         PYMTRCVD'Monto Pagado',
+         NCF
+     FROM dbo.vw_VentasGP
+WHERE DOCDATE BETWEEN '20120101' AND '20120131' AND PYMTRCVD=0 AND SOPNUMBE NOT IN (SELECT s.SOPNUMBE FROM SOP30200 s INNER JOIN SOP30300 s2 ON s.SOPNUMBE=s2.SOPNUMBE
+WHERE DOCDATE BETWEEN '20120101' AND '20120131' AND PYMTRCVD=0 AND VOIDSTTS=0)
+ORDER BY SOPNUMBE
+SELECT * FROM SOP30200 s INNER JOIN SOP30300 s2 ON s.SOPNUMBE=s2.SOPNUMBE
+WHERE DOCDATE BETWEEN '20120101' AND '20120131' AND PYMTRCVD=0 AND VOIDSTTS=0 AND s2.SOPNUMBE IN (SELECT SOPNUMBE FROM dbo.View_VentasGP2
+WHERE DOCDATE BETWEEN '20120101' AND '20120131' AND PYMTRCVD=0 )
+
+
+
+
+SELECT * FROM PalmComSync..OUT_SECUENCI
+WHERE PALMID='GEA088'

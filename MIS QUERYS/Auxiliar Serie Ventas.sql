@@ -1,0 +1,194 @@
+SELECT Id_Cliente,
+	   REPLACE(CUSTNAME,',',' ') 'Nombre',
+	   Tipo_Documento,
+	   Numero_doc,
+	   Id_Lote,
+	   CASE Origen_Lote WHEN 'Sales Entry' THEN 'Facturas' ELSE 'Pagos' END 'Origen',
+	   Origen_Lote,
+	   TRXSORCE,
+	   Doc_Fecha,
+	   Usuario,
+	   Monto_Original,
+	  
+	   REPLACE(Trans_Descripcion,',',' ')Trans_Descripcion,
+	   Num_Cuenta,
+	   SUM(Debito)Debito,
+	   SUM(Credito)Credito,
+	   Estado
+FROM (
+SELECT RO.CUSTNMBR Id_Cliente,
+       RO.CPRCSTNM Id_Corporacion,
+       CASE RO.RMDTYPAL
+         WHEN 0 THEN 'Reservado'
+         WHEN 1 THEN 'Factura'
+         WHEN 2 THEN 'Scheduled Pmt'
+         WHEN 3 THEN 'Nota de Debito'
+         WHEN 4 THEN 'Cargo Financiero'
+         WHEN 5 THEN 'Servicios Reparacion'
+         WHEN 6 THEN 'Garantia'
+         WHEN 7 THEN 'Nota de Credito'
+         WHEN 8 THEN 'Devolucion'
+         WHEN 9 THEN 'Pagos'
+         ELSE ''
+         END Tipo_Documento,
+       RO.DOCNUMBR Numero_doc,
+       
+       RO.BACHNUMB Id_Lote,
+       RO.BCHSOURC Origen_Lote,
+       RO.TRXSORCE ,
+       RO.DOCDATE Doc_Fecha,
+       RO.PSTUSRID Usuario,
+      
+       RO.ORTRXAMT Monto_Original,
+       RO.CURTRXAM Monto_Actual,
+       RO.SLSAMNT Monto_ventas,
+       RO.TAXAMNT Monto_Itbis,
+       RO.TRXDSCRN Trans_Descripcion,
+      
+       coalesce(G.ACTNUMST,'') Num_Cuenta,
+       coalesce(DO.DEBITAMT,0) Debito,
+       coalesce(DO.CRDTAMNT,0) Credito,
+		CASE RO.VOIDSTTS WHEN 1 THEN 'Anulado'
+					 WHEN 0 THEN 'Normal'
+					 ELSE '' END 'Estado'
+FROM RM20101 RO
+    LEFT OUTER JOIN
+       RM10101 DO
+       ON RO.RMDTYPAL = DO.RMDTYPAL
+       AND RO.DOCNUMBR = DO.DOCNUMBR
+    LEFT OUTER JOIN
+       GL00105 G
+       ON DO.DSTINDX = G.ACTINDX
+ WHERE 
+ YEAR(RO.DOCDATE)=2012 AND RO.RMDTYPAL=9
+
+) a INNER JOIN RM00101 r ON a.Id_Cliente=r.CUSTNMBR
+GROUP BY Id_Cliente,
+	   r.CUSTNAME,
+	   Tipo_Documento,
+	   Numero_doc,
+	   Id_Lote,
+	   Origen_Lote,
+	   TRXSORCE,
+	   Doc_Fecha,
+	   Usuario,
+	   Monto_Original,
+	 
+	   Trans_Descripcion,
+	   Num_Cuenta,
+	   Estado
+	   
+
+SELECT * FROM RM30101
+WHERE DOCNUMBR='RC01574292'
+
+SELECT  YEAR(DOCDATE)'Año', 
+		BACHNUMB,
+		 DOCNUMBR,
+		 BCHSOURC,
+		 CASE RMDTYPAL
+         WHEN 0 THEN 'Reservado'
+         WHEN 1 THEN 'Factura'
+         WHEN 2 THEN 'Scheduled Pmt'
+         WHEN 3 THEN 'Nota de Debito'
+         WHEN 4 THEN 'Cargo Financiero'
+         WHEN 5 THEN 'Servicios Reparacion'
+         WHEN 6 THEN 'Garantia'
+         WHEN 7 THEN 'Nota de Credito'
+         WHEN 8 THEN 'Devolucion'
+         WHEN 9 THEN 'Pagos'
+         ELSE ''
+         END Tipo_Documento,
+		 CUSTNMBR,
+		 DOCDATE,
+		 DOCAMNT,
+		 POSTED,
+		 SUM(DEBITAMT)DEBITO, 
+		 SUM(CRDTAMNT)CREDITO 
+		 FROM (
+SELECT BACHNUMB,RM1.DOCNUMBR,BCHSOURC,RM1.RMDTYPAL,RM1.CUSTNMBR,DOCDATE,DOCAMNT,RM1.POSTED,DEBITAMT,CRDTAMNT FROM RM10301 RM INNER JOIN RM10101 RM1 ON RM.DOCNUMBR=RM1.DOCNUMBR
+WHERE DOCDATE BETWEEN '20120101' AND '20121231'
+
+UNION ALL
+
+SELECT BACHNUMB,RM1.DOCNUMBR,BCHSOURC,RM1.RMDTYPAL,RM1.CUSTNMBR,DOCDATE,ORTRXAMT,RM1.POSTED,DEBITAMT,CRDTAMNT FROM RM10201 RM INNER JOIN RM10101 RM1 ON RM.DOCNUMBR=RM1.DOCNUMBR
+WHERE DOCDATE BETWEEN '20120101' AND '20121231')a
+
+
+GROUP BY BACHNUMB,
+		 DOCNUMBR,
+		 BCHSOURC,
+		 RMDTYPAL,
+		 CUSTNMBR,
+		 DOCDATE,
+		 DOCAMNT,
+		 POSTED
+
+
+
+
+SELECT r.CUSTNMBR , a.* 
+FROM RM00101 as r
+OUTER APPLY (
+	SELECT TOP 2 r3.DOCNUMBR FROM RM20101 as r3	
+	WHERE r.CUSTNMBR=r3.CUSTNMBR AND DOCDATE='20150301'
+
+) as a 
+WHERE a.DOCNUMBR IS NOT NULL
+
+
+
+SELECT CUSTNMBR,
+       RMDTYPAL,
+       ORTRXAMT,
+       DATEPART(yy,DOCDATE)YearOld,
+	   SUM(ORTRXAMT)OVER(PARTITION BY CUSTNMBR ORDER BY DATEPART(yy,DOCDATE),1 ) Suma
+
+FROM RM20101
+WHERE DOCDATE='20150101'
+
+ORDER BY CUSTNMBR
+
+
+SELECT *
+
+FROM RM20101
+
+
+
+SELECT ORMSTRID,HSTYEAR, SUM(CRDTAMNT)OVER(PARTITION BY ORMSTRID ORDER BY HSTYEAR ASC) 
+FROM GL30000
+WHERE ORMSTRID='0114'
+ORDER BY ORMSTRID,HSTYEAR
+
+
+
+SELECT * FROM GL30000
+WHERE ORDOCNUM='RC01787561'
+
+
+SELECT * FROM GL30000
+WHERE ORCTRNUM='RC01787561'
+
+
+SELECT * FROM RM10101
+WHERE DSTINDX>0
+
+
+SELECT * FROM PM30200
+WHERE VCHRNMBR='00000000000062683'
+
+SELECT * FROM PM30300
+WHERE VENDORID='0532' AND DOCTYPE=5
+
+SELECT * FROM PM30300
+WHERE VCHRNMBR='00000000000062683'
+
+SELECT PALMID, YEAR(FECHAFAC)'YEAR' FROM PalmComSync..IN_FACTURA_TEMP
+WHERE CODCLIE='27251' --AND YEAR(FECHAFAC)='2015'
+GROUP BY PALMID,YEAR(FECHAFAC)
+ORDER BY YEAR(FECHAFAC)
+
+
+SELECT * FROM PalmComSyncRS..OUT_CLIENTES
+WHERE CODCLIE='27251'

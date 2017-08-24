@@ -1,0 +1,26 @@
+select * from IN_FACTURA_TEMP
+where NOT EXISTS (select * from IN_FACTURA 
+where IN_FACTURA_TEMP.FACNUM = IN_FACTURA.FACNUM)
+AND FECHAFAC   = '2016.09.05'
+
+
+/*
+INSERT INTO IN_FACTURA
+select * from IN_FACTURA_TEMP
+where NOT EXISTS (select * from IN_FACTURA 
+where IN_FACTURA_TEMP.FACNUM = IN_FACTURA.FACNUM)
+AND FECHAFAC   = '2016.09.05'
+
+*/
+select * from IN_FACTURA
+where FECHAFAC = '2016.09.05'
+
+select * from IN_FACTURA_TEMP
+where FECHAFAC = '2016.09.05'
+
+
+/*
+insert into IN_FACTURA 
+select * from IN_FACTURA_TEMP
+where FECHAFAC = '2016.09.05'
+*/

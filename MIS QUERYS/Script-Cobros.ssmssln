@@ -1,0 +1,9 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+Project("{4F2E2C19-372F-40D8-9FA7-9D2138C6997A}") = "Cobros-Documentos Aplicados", "Cobros-Documentos Aplicados\Cobros-Documentos Aplicados.ssmssqlproj", "{8A535FE8-0233-4BC1-A6D5-54AC9A6FA6AA}"
+EndProject
+Global
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

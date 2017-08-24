@@ -1,0 +1,78 @@
+     SELECT DISTINCT 
+     r.IdZona , 
+       r.ZonaResp Responsable,
+       r1.CUSTCLAS IdClase, 
+       r1.CUSTNMBR,
+       SOPNUMBE,
+      
+      -- u.NombreRuta,
+       --v.ITEMNMBR,
+       ((SUM(QUANTITY))/COUNT(*))/ COUNT(SOPNUMBE)OVER (PARTITION BY SOPNUMBE)'CANTIDAD',
+      ((SUM(XTNDPRCE))/COUNT(*))/ COUNT(SOPNUMBE)OVER (PARTITION BY SOPNUMBE)'MONTO'
+FROM dbo.vw_VentasGPconConduceCA1 v 
+INNER JOIN [DataRS].[dbo].[vw_encvendedorRuta] u ON v.IdVendedor= u.IDVENDEDOR AND v.DOCDATE=u.FECHA 
+INNER JOIN PalmComSync..vw_RutaZona r ON u.NombreRuta=r.NombreRuta
+
+INNER JOIN RM00101 r1 ON v.CUSTNMBR=r1.CUSTNMBR
+WHERE DOCDATE BETWEEN '20160401' AND '20160430' AND DOCID NOT IN( 'A0100800101','A0100800115','A0100800114')  AND UNITPRCE<>0
+   AND r1.CUSTCLAS<>'PUESTO DE VENTA'  AND LOCNCODE='SANISIDRO'
+   
+AND u.NombreRuta LIKE 'SD100%' AND r.IdZona BETWEEN 'GA-01' AND 'GA-05' AND v.ITEMNMBR ='PT100'
+GROUP BY r.IdZona , 
+        r.ZonaResp ,
+       r1.CUSTCLAS  , 
+       
+       r1.CUSTNMBR,
+      -- u.NombreRuta,
+       SOPNUMBE,
+       --v.ITEMNMBR,
+       v.QUANTITY,
+       v.XTNDPRCE
+       
+ORDER BY SOPNUMBE
+
+
+
+     SELECT DISTINCT 
+     u.IdZona , 
+       u.ZonaResp Responsable,
+       r1.CUSTCLAS IdClase, 
+       r1.CUSTNMBR,
+       SOPNUMBE,
+      
+      -- u.NombreRuta,
+       --v.ITEMNMBR,
+       ((SUM(QUANTITY))/COUNT(*))/ COUNT(SOPNUMBE)OVER (PARTITION BY SOPNUMBE)'CANTIDAD',
+      ((SUM(XTNDPRCE))/COUNT(*))/ COUNT(SOPNUMBE)OVER (PARTITION BY SOPNUMBE)'MONTO'
+FROM dbo.vw_VentasGPconConduceCA1 v 
+INNER JOIN (SELECT CodCliente,NombreRuta,IDVENDEDOR,FECHA,IdZona,ZonaResp FROM [DataRS].[dbo].vw_ruta_sustitutos_vendedor_h
+WHERE FECHA BETWEEN '20160401' AND '20160430' )u ON RTRIM(v.IdVendedor)= RTRIM(u.IDVENDEDOR) AND CAST(v.DOCDATE AS DATE)=u.FECHA  AND RTRIM(u.CodCliente)=RTRIM(v.CUSTNMBR)
+--INNER JOIN PalmComSync..vw_RutaZona r ON u.NombreRuta=r.NombreRuta
+
+INNER JOIN RM00101 r1 ON v.CUSTNMBR=r1.CUSTNMBR
+WHERE DOCDATE BETWEEN '20160401' AND '20160430' AND DOCID NOT IN( 'A0100800101','A0100800115','A0100800114')  AND UNITPRCE<>0
+   AND r1.CUSTCLAS<>'PUESTO DE VENTA'  AND LOCNCODE='SANISIDRO'
+   
+AND u.NombreRuta LIKE 'SD100%' AND u.IdZona BETWEEN 'GA-01' AND 'GA-05' AND v.ITEMNMBR ='PT100'
+GROUP BY u.IdZona , 
+        u.ZonaResp ,
+       r1.CUSTCLAS  , 
+       
+       r1.CUSTNMBR,
+      -- u.NombreRuta,
+       SOPNUMBE,
+       --v.ITEMNMBR,
+       v.QUANTITY,
+       v.XTNDPRCE
+       
+ORDER BY SOPNUMBE
+
+
+
+SELECT * FROM [DataRS].[dbo].vw_ruta_sustitutos_vendedor_h
+WHERE FECHA BETWEEN '20160404' AND '20160404' AND CodCliente='10043'
+ORDER BY CodCliente
+
+
+SELECT * FROM GPHN..vw_VentasGPconConduceCA1
+WHERE CUSTNMBR='10043' AND DOCDATE='20160404'

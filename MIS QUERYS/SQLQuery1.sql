@@ -1,0 +1,3 @@
+select * from rm10201
+where DOCDATE = '2013.07.10'
+ORDER BY DOCNUMBR
